@@ -1,74 +1,134 @@
-import { useState } from "react";
-import { StarIcon } from "@heroicons/react/20/solid";
+import { useEffect, useState } from "react";
 import { RadioGroup } from "@headlessui/react";
 import { Box, Button, Grid, LinearProgress, Rating } from "@mui/material";
 import ProductReviewCard from "./ProductReviewCard";
 import { mens_kurta } from "../../../Data/mens_kurta";
 import HomeSectionCard from "../HomeSectionCard/HomeSectionCard";
+import { useNavigate, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { findProductsById } from "../../../State/Product/Action";
+import { addItemToCart } from "../../../State/Cart/Action";
+import { getAllRatingsReviews } from "../../../State/Rating/Action";
 
 const product = {
-  name: "Basic Tee 6-Pack",
-  price: "$192",
-  href: "#",
-  breadcrumbs: [
-    { id: 1, name: "Men", href: "#" },
-    { id: 2, name: "Clothing", href: "#" },
-  ],
-  images: [
-    {
-      src: "https://tailwindui.com/img/ecommerce-images/product-page-02-secondary-product-shot.jpg",
-      alt: "Two each of gray, white, and black shirts laying flat.",
-    },
-    {
-      src: "https://tailwindui.com/img/ecommerce-images/product-page-02-tertiary-product-shot-01.jpg",
-      alt: "Model wearing plain black basic tee.",
-    },
-    {
-      src: "https://tailwindui.com/img/ecommerce-images/product-page-02-tertiary-product-shot-02.jpg",
-      alt: "Model wearing plain gray basic tee.",
-    },
-    {
-      src: "https://tailwindui.com/img/ecommerce-images/product-page-02-featured-product-shot.jpg",
-      alt: "Model wearing plain white basic tee.",
-    },
-  ],
-  colors: [
-    { name: "White", class: "bg-white", selectedClass: "ring-gray-400" },
-    { name: "Gray", class: "bg-gray-200", selectedClass: "ring-gray-400" },
-    { name: "Black", class: "bg-gray-900", selectedClass: "ring-gray-900" },
-  ],
   sizes: [
     { name: "S", inStock: true },
     { name: "M", inStock: true },
     { name: "L", inStock: true },
     { name: "XL", inStock: true },
   ],
-  description:
-    'The Basic Tee 6-Pack allows you to fully express your vibrant personality with three grayscale options. Feeling adventurous? Put on a heather gray tee. Want to be a trendsetter? Try our exclusive colorway: "Black". Need to add an extra pop of color to your outfit? Our white tee has you covered.',
-  highlights: [
-    "Hand cut and sewn locally",
-    "Dyed with our proprietary colors",
-    "Pre-washed & pre-shrunk",
-    "Ultra-soft 100% cotton",
-  ],
-  details:
-    'The 6-Pack includes two black, two white, and two heather gray Basic Tees. Sign up for our subscription service and be the first to get new, exciting colors, like our upcoming "Charcoal Gray" limited release.',
 };
-const reviews = { href: "#", average: 4, totalCount: 117 };
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
+const calculateRatingDistribution = (ratings) => {
+  if (!Array.isArray(ratings)) {
+    console.error("Invalid ratings data:", ratings);
+    return {
+      averageRating: 0,
+      ratingDistribution: {
+        excellent: 0,
+        veryGood: 0,
+        good: 0,
+        average: 0,
+        poor: 0,
+      },
+      percentageDistribution: {
+        excellent: 0,
+        veryGood: 0,
+        good: 0,
+        average: 0,
+        poor: 0,
+      },
+    };
+  }
+
+  const totalRatings = ratings.length;
+
+  if (totalRatings === 0) {
+    return {
+      averageRating: 0,
+      ratingDistribution: {
+        excellent: 0,
+        veryGood: 0,
+        good: 0,
+        average: 0,
+        poor: 0,
+      },
+      percentageDistribution: {
+        excellent: 0,
+        veryGood: 0,
+        good: 0,
+        average: 0,
+        poor: 0,
+      },
+    };
+  }
+
+  const averageRating =
+    ratings.reduce((sum, rating) => sum + rating.rating, 0) / totalRatings;
+
+  const ratingDistribution = {
+    excellent: 0,
+    veryGood: 0,
+    good: 0,
+    average: 0,
+    poor: 0,
+  };
+
+  ratings.forEach((rating) => {
+    if (rating.rating >= 4.5) {
+      ratingDistribution.excellent += 1;
+    } else if (rating.rating >= 4.0) {
+      ratingDistribution.veryGood += 1;
+    } else if (rating.rating >= 3.5) {
+      ratingDistribution.good += 1;
+    } else if (rating.rating >= 3.0) {
+      ratingDistribution.average += 1;
+    } else {
+      ratingDistribution.poor += 1;
+    }
+  });
+
+  const percentageDistribution = {
+    excellent: (ratingDistribution.excellent / totalRatings) * 100,
+    veryGood: (ratingDistribution.veryGood / totalRatings) * 100,
+    good: (ratingDistribution.good / totalRatings) * 100,
+    average: (ratingDistribution.average / totalRatings) * 100,
+    poor: (ratingDistribution.poor / totalRatings) * 100,
+  };
+  return { averageRating, ratingDistribution, percentageDistribution };
+};
 
 export default function ProductDetails() {
-  const [selectedColor, setSelectedColor] = useState(product.colors[0]);
-  const [selectedSize, setSelectedSize] = useState(product.sizes[2]);
+  const [selectedSize, setSelectedSize] = useState("");
+  const navigate = useNavigate();
+  const params = useParams();
+  const dispatch = useDispatch();
+  const { products, rating } = useSelector((store) => store);
 
+  const handleAddToCart = () => {
+    const data = { productId: params.productId, size: selectedSize.name };
+    console.log("Add item to cart", data);
+    dispatch(addItemToCart(data));
+    navigate("/cart");
+  };
+  useEffect(() => {
+    const productId = params.productId?.toString();
+    const data = { productId };
+    dispatch(findProductsById(data));
+    dispatch(getAllRatingsReviews(productId));
+  }, [params.productId, dispatch]);
+  const ratings = rating.ratingsReviews.ratings;
+  const { averageRating, ratingDistribution, percentageDistribution } =
+    calculateRatingDistribution(ratings);
+  console.log("average", ratings);
   return (
     <div className="bg-white lg:px-20">
       <div className="pt-6">
         <nav aria-label="Breadcrumb">
-          <ol
+          {/* <ol
             role="list"
             className="mx-auto flex max-w-2xl items-center space-x-2 px-4 sm:px-6 lg:max-w-7xl lg:px-8"
           >
@@ -103,19 +163,19 @@ export default function ProductDetails() {
                 {product.name}
               </a>
             </li>
-          </ol>
+          </ol> */}
         </nav>
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-10 px-4 pt-10">
           {/* Image gallery */}
           <div className="flex flex-col items-center">
             <div className="overflow-hidden rounded-lg max-w-[30rem] max-h-[35rem]">
               <img
-                src={product.images[0].src}
-                alt={product.images[0].alt}
+                src={products.product?.imageUrl}
+                alt="ima"
                 className="h-full w-full object-cover object-center"
               />
             </div>
-            <div className="flex flex-wrap space-x-5 justify-center">
+            {/* <div className="flex flex-wrap space-x-5 justify-center">
               {product.images.map((image) => (
                 <div className="aspect-h-2 aspect-w-3 overflow-hidden rounded-lg max-w-[5rem] max-h-[5rem] mt-4 ">
                   <img
@@ -125,16 +185,16 @@ export default function ProductDetails() {
                   />
                 </div>
               ))}
-            </div>
+            </div> */}
           </div>
           {/* Product info */}
           <div className="lg:col-span-1 maxt-auto max-w-2xl px-4 pb-16 sm:px-6 lg:max-w-7xl lg:px-8 lg:pb-24">
             <div className="lg:col-span-2">
               <h1 className="text-lg lg:text-xl font-semibold text-gray-900">
-                jxcjdn
+                {products.product?.brand}
               </h1>
               <h1 className="text-lg lg:text-xl text-gray-900 opacity-60 pt-1">
-                kldsncksnn
+                {products.product?.title}
               </h1>
             </div>
 
@@ -142,18 +202,23 @@ export default function ProductDetails() {
             <div className="mt-4 lg:row-span-3 lg:mt-0">
               <h2 className="sr-only">Product information</h2>
               <div className="flex space-x-5 items-center text-lg lg:text-xl text-gray-900 mt-6">
-                <p className="font-semibold">Rs.199</p>
-                <p className="opactiy-50 line-through">Rs.211</p>
-                <p className="text-green-600 font-semibold">50% Off</p>
+                <p className="font-semibold">
+                  ₹{products.product?.discountedPrice}
+                </p>
+                <p className="opactiy-50 line-through">
+                  ₹{products.product?.price}
+                </p>
+                <p className="text-green-600 font-semibold">
+                  {products.product?.discountedPercent + "% OFF"}
+                </p>
               </div>
 
               {/* Reviews */}
               <div className="mt-6">
                 <div className="flex items-center space-x-3">
                   <Rating name="read-only" value={3.5} readOnly />
-                  <p className="opacity-50 text-sm">56640 Ratings</p>
-                  <p className="ml-3 text-sm font-medium text-indigo-600 hover:text-indigo-500">
-                    3867 Reviews
+                  <p className="opacity-50 text-sm text-indigo-600 hover:text-indigo-500 font-semibold">
+                    {products.product?.ratings?.length} Ratings & Reviews
                   </p>
                 </div>
               </div>
@@ -234,8 +299,14 @@ export default function ProductDetails() {
                 </div>
 
                 <Button
+                  onClick={handleAddToCart}
                   variant="contained"
-                  sx={{ px: "2rem", py: "1rem", bgColor: "#9155fd" }}
+                  sx={{
+                    px: "2rem",
+                    py: "1rem",
+                    bgColor: "#9155fd",
+                    marginTop: "2rem",
+                  }}
                 >
                   Add to Cart
                 </Button>
@@ -249,32 +320,8 @@ export default function ProductDetails() {
 
                 <div className="space-y-6">
                   <p className="text-base text-gray-900">
-                    {product.description}
+                    {products?.product?.description}
                   </p>
-                </div>
-              </div>
-
-              <div className="mt-10">
-                <h3 className="text-sm font-medium text-gray-900">
-                  Highlights
-                </h3>
-
-                <div className="mt-4">
-                  <ul role="list" className="list-disc space-y-2 pl-4 text-sm">
-                    {product.highlights.map((highlight) => (
-                      <li key={highlight} className="text-gray-400">
-                        <span className="text-gray-600">{highlight}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-
-              <div className="mt-10">
-                <h2 className="text-sm font-medium text-gray-900">Details</h2>
-
-                <div className="mt-4 space-y-6">
-                  <p className="text-sm text-gray-600">{product.details}</p>
                 </div>
               </div>
             </div>
@@ -287,8 +334,8 @@ export default function ProductDetails() {
             <Grid container spacing={7}>
               <Grid item sx={7}>
                 <div className="space-y-5">
-                  {[1, 1, 1].map((item) => (
-                    <ProductReviewCard />
+                  {rating.ratingsReviews.ratings?.map((item) => (
+                    <ProductReviewCard key={item.id} item={item} />
                   ))}
                 </div>
               </Grid>
@@ -296,79 +343,43 @@ export default function ProductDetails() {
                 <h1 className="text-xl font-semibold pb-2">Product Ratings</h1>
 
                 <div className="flex items-center space-x-3">
-                  <Rating value={4.6} precision={0.5} readOnly />
-                  <p className="opacity-60">5644 Reatings</p>
+                  <Rating value={averageRating} precision={0.5} readOnly />
+                  <p className="opacity-60">{rating.length} Ratings</p>
                 </div>
                 <Box className="mt-5 space-y-3">
-                  <Grid container alignItems="center" gap={3}>
-                    <Grid item xs={2}>
-                      <p>Excellent</p>
+                  {Object.keys(percentageDistribution).map((ratingLevel) => (
+                    <Grid
+                      container
+                      alignItems="center"
+                      gap={3}
+                      key={ratingLevel}
+                    >
+                      <Grid item xs={2}>
+                        <p>
+                          {ratingLevel.charAt(0).toUpperCase() +
+                            ratingLevel.slice(1)}
+                        </p>
+                      </Grid>
+                      <Grid item xs={7}>
+                        <LinearProgress
+                          sx={{
+                            bgColor: "#d0d0d0",
+                            borderRadius: 4,
+                            height: 7,
+                          }}
+                          variant="determinate"
+                          value={percentageDistribution[ratingLevel]}
+                          color={
+                            ratingLevel === "excellent"
+                              ? "success"
+                              : ratingLevel === "poor"
+                              ? "error"
+                              : "warning"
+                          }
+                        />
+                      </Grid>
                     </Grid>
-                    <Grid item xs={7}>
-                      <LinearProgress
-                        sx={{ bgColor: "#d0d0d0", borderRadius: 4, height: 7 }}
-                        variant="determinate"
-                        value={40}
-                        color="success"
-                      />
-                    </Grid>
-                  </Grid>
-                  <Grid container alignItems="center" gap={3}>
-                    <Grid item xs={2}>
-                      <p>Very Good</p>
-                    </Grid>
-                    <Grid item xs={7}>
-                      <LinearProgress
-                        sx={{ bgColor: "#d0d0d0", borderRadius: 4, height: 7 }}
-                        variant="determinate"
-                        value={30}
-                        color="success"
-                      />
-                    </Grid>
-                  </Grid>
-                  <Grid container alignItems="center" gap={3}>
-                    <Grid item xs={2}>
-                      <p>Good</p>
-                    </Grid>
-                    <Grid item xs={7}>
-                      <LinearProgress
-                        sx={{
-                          bgColor: "#d0d0d0",
-                          borderRadius: 4,
-                          height: 7,
-                          color: "yellow",
-                        }}
-                        variant="determinate"
-                        value={25}
-                      />
-                    </Grid>
-                  </Grid>
-                  <Grid container alignItems="center" gap={3}>
-                    <Grid item xs={2}>
-                      <p>Average</p>
-                    </Grid>
-                    <Grid item xs={7}>
-                      <LinearProgress
-                        sx={{ bgColor: "#d0d0d0", borderRadius: 4, height: 7 }}
-                        variant="determinate"
-                        value={20}
-                        color="warning"
-                      />
-                    </Grid>
-                  </Grid>
-                  <Grid container alignItems="center" gap={3}>
-                    <Grid item xs={2}>
-                      <p>Poor</p>
-                    </Grid>
-                    <Grid item xs={7}>
-                      <LinearProgress
-                        sx={{ bgColor: "#d0d0d0", borderRadius: 4, height: 7 }}
-                        variant="determinate"
-                        value={10}
-                        color="error"
-                      />
-                    </Grid>
-                  </Grid>
+                  ))}
                 </Box>
               </Grid>
             </Grid>

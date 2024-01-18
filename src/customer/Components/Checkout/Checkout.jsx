@@ -5,9 +5,10 @@ import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import DeliveryAddressForm from "./DeliveryAddressForm";
 import OrderSummary from "./OrderSummary";
+import { useSelector } from "react-redux";
 
 const steps = ["Login", "Delivery Address", "Order Summary", "Payment"];
 
@@ -16,17 +17,19 @@ export default function Checkout() {
   const location = useLocation();
   const querySearch = new URLSearchParams(location.search);
   const step = querySearch.get("step");
-
-  const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-  };
+  const navigate = useNavigate();
+  const { order } = useSelector((store) => store);
+  React.useEffect(() => {
+    if (order.orderStatus === "CONFIRMED") {
+      navigate(`/payment/${order._id}`);
+    }
+  }, [order.orderStatus, navigate, order._id]);
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
-
   return (
-    <div className="px-10 lg:px-20">
+    <div className="px-10 lg:px-20 mt-8">
       <Box sx={{ width: "100%" }}>
         <Stepper activeStep={step}>
           {steps.map((label, index) => {
@@ -59,7 +62,7 @@ export default function Checkout() {
               </Button>
             </Box>
             <div className="mt-10">
-              {step === 2 ? <DeliveryAddressForm /> : <OrderSummary />}
+              {step === "2" ? <DeliveryAddressForm /> : <OrderSummary />}
             </div>
           </React.Fragment>
         )}

@@ -34,7 +34,7 @@ const HomeSectionCarosel = ({ data, sectionName }) => {
         {sectionName}
       </h2>
 
-      <div className="relative p-5">
+      <div className="relative p-8">
         <AliceCarousel
           items={items}
           responsive={responsive}

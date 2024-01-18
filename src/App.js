@@ -1,27 +1,16 @@
-import HomePage from "./customer/Pages/HomePage/HomePage";
-import Navigation from "./customer/Components/Navigation/Navigation";
-import Footer from "./customer/Components/Footer/Footer";
-import Product from "./customer/Components/Product/Product";
-import ProductDetails from "./customer/Components/ProductDetails/ProductDetails";
-import Cart from "./customer/Components/Cart/Cart";
-import Checkout from "./customer/Checkout/Checkout";
+import { Routes, Route } from "react-router-dom";
+import CustomerRoutes from "./Routers/CustomerRoutes";
+import AdminRouters from "./Routers/AdminRouters";
+
 function App() {
   return (
     <div className="App">
-      <Navigation />
-      <div>
-        {/* <HomePage /> */}
-        {/* <Product /> */}
-        {/* <ProductDetails /> */}
-        {/* <Cart /> */}
-        <Checkout />
-      </div>
-      <Footer />
+      <Routes>
+        <Route path="/*" element={<CustomerRoutes />} />
+        <Route path="/admin/*" element={<AdminRouters />} />
+      </Routes>
     </div>
   );
 }
 
-
 export default App;
-
-

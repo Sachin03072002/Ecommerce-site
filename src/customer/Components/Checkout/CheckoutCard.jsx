@@ -5,7 +5,7 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { useDispatch } from "react-redux";
 import { removeCartItem, updateCartItem } from "../../../State/Cart/Action";
 
-const CartItem = ({ item }) => {
+const CheckoutCard = ({ item }) => {
   const dispatch = useDispatch();
   const handleUpdateCartItem = (num) => {
     const data = {
@@ -23,20 +23,23 @@ const CartItem = ({ item }) => {
         <div className="w-[5rem] h-[5rem] lg:w-[9rem] lg:h-[9rem]">
           <img
             className="w-full h-full object-cover object-top"
-            src={item.product.imageUrl}
+            src={item.product[0]?.imageUrl}
             alt=""
           />
         </div>
         <div className="ml-5 space-y-1">
-          <p className="font-semibold">{item.product.title}</p>
+          <p className="font-semibold">{item.product[0]?.title}</p>
           <p className="opacity-70 ">
-            {item.product.size} {item.product.color}
+            {item.product[0]?.size} {item.product[0]?.color}
           </p>
-          <p className="opacity-70 mt-2">{item.product.brand}</p>
+          <p className="opacity-70 mt-2">{item.product[0]?.brand}</p>
 
           <div className="flex space-x-5 items-center lg:text-xl text-gray-900 pt-6 ">
-            <p className="font-semibold">₹{item.discountedPrice}</p>
-            <p className="opactiy-50 line-through">₹{item.price}</p>
+            <p className="font-semibold">{item.discountedPrice}</p>
+            <p className="opactiy-50 line-through">{item.price}</p>
+            <p className="text-green-600 font-semibold">
+              {item.discountPercent}
+            </p>
           </div>
         </div>
       </div>
@@ -69,4 +72,4 @@ const CartItem = ({ item }) => {
   );
 };
 
-export default CartItem;
+export default CheckoutCard;

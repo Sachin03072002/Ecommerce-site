@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Dialog, Popover, Tab, Transition } from "@headlessui/react";
 import {
   Bars3Icon,
@@ -6,16 +6,96 @@ import {
   ShoppingBagIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import HdrWeakIcon from "@mui/icons-material/HdrWeak";
 
 import { navigation } from "./navigationData";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Avatar, Button, Menu, MenuItem } from "@mui/material";
+import AuthModal from "../../auth/AuthModal";
+import { useDispatch, useSelector } from "react-redux";
+import { getUser, logout } from "../../../State/Auth/Action";
+import { getCart } from "../../../State/Cart/Action";
+import { findProducts, getAllProducts } from "../../../State/Product/Action";
+
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
 export default function Navigation() {
   const [open, setOpen] = useState(false);
+  const [openAuthModel, setOpenAuthModel] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [isClosed, setIsClosed] = useState(false);
+  const openUserMenu = Boolean(anchorEl);
+  const navigate = useNavigate();
+  const jwt = localStorage.getItem("jwt");
+  const { auth, cart, products } = useSelector((store) => store);
+  const dispatch = useDispatch();
+  const location = useLocation();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchSuggestions, setSearchSuggestions] = useState([]);
 
+  const handleSearchInputChange = (e) => {
+    const searchQuery = e.target.value;
+    setSearchQuery(searchQuery);
+    setIsClosed(false);
+  };
+  const handleSearch = () => {
+    console.log("Perform search for:", searchQuery);
+    setIsClosed(true);
+  };
+  const close = () => {
+    setIsClosed(true);
+  };
+  const handleUserClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleCloseUserMenu = (event) => {
+    setAnchorEl(null);
+  };
+  const handleOpen = () => {
+    setOpenAuthModel(true);
+  };
+  const handleClose = () => {
+    setOpenAuthModel(false);
+  };
+  const handleCategoryChange = (category, section, item, close) => {
+    navigate(`/${category.id}/${section.id}/${item.id}`);
+    close();
+  };
+  useEffect(() => {
+    if (jwt) {
+      dispatch(getUser(jwt));
+    }
+  }, [jwt, auth.jwt, dispatch]);
+  useEffect(() => {
+    if (auth.user) {
+      handleClose();
+    }
+    if (location.pathname === "/login" || location.pathname === "/register") {
+      navigate("/");
+    }
+  }, [auth.user, navigate, location.pathname]);
+  useEffect(() => {
+    dispatch(getCart());
+  }, [cart.updateCartItem, cart.deleteCartItem, dispatch]);
+  const handleLogout = () => {
+    dispatch(logout());
+    handleCloseUserMenu();
+  };
+  const handleGoToCart = () => {
+    navigate("/cart");
+  };
+  const handleGoToProfile = () => {
+    navigate(`/profile/${auth.user._id}`);
+    handleCloseUserMenu();
+  };
+  const handleHome = () => {
+    navigate("/");
+  };
+  const handleGoToOrder = () => {
+    navigate(`/account/order/user/${auth.user._id}`);
+    handleCloseUserMenu();
+  };
   return (
     <div className="bg-white z-50 relative">
       {/* Mobile menu */}
@@ -216,11 +296,20 @@ export default function Navigation() {
               </button>
 
               {/* Logo */}
-              <div className="ml-4 flex lg:ml-0">
-                <a href="#">
-                  <span className="sr-only">Your Company</span>
-                  <HdrWeakIcon className="font-5" />
-                </a>
+              <div
+                className="ml-4 flex lg:ml-0 cursor-pointer"
+                onClick={handleHome}
+              >
+                <img
+                  className="h-8 w-8 mr-2"
+                  src="https://friconix.com/png/fi-cnluxl-circle-notch.png"
+                  alt=""
+                />
+                <img
+                  src="https://th.bing.com/th/id/R.b94a42acc82b75abc2b6c8754a6fcd8e?rik=CuAobz2IOk3SDw&riu=http%3a%2f%2fwww.tieroom.co.uk%2fmedia%2ftieroom%2flanding_page%2fnotch-logo_transparent_background.png&ehk=FF55qrrs%2f2MYFYJr0i2xjUtqyW0C5kUQzh7xMG%2bYHm8%3d&risl=&pid=ImgRaw&r=0"
+                  alt=""
+                  className="h-8 w-12 mr-2"
+                />
               </div>
 
               {/* Flyout menus */}
@@ -289,7 +378,7 @@ export default function Navigation() {
                                             aria-hidden="true"
                                             className="mt-1"
                                           >
-                                            Shop now
+                                            Shop Now
                                           </p>
                                         </div>
                                       ))}
@@ -313,12 +402,19 @@ export default function Navigation() {
                                                 key={item.name}
                                                 className="flex"
                                               >
-                                                <a
-                                                  href={item.href}
-                                                  className="hover:text-gray-800"
+                                                <p
+                                                  onClick={() =>
+                                                    handleCategoryChange(
+                                                      category,
+                                                      section,
+                                                      item,
+                                                      close
+                                                    )
+                                                  }
+                                                  className="cursor-pointer hover:text-gray-800"
                                                 >
                                                   {item.name}
-                                                </a>
+                                                </p>
                                               </li>
                                             ))}
                                           </ul>
@@ -349,65 +445,106 @@ export default function Navigation() {
 
               <div className="ml-auto flex items-center">
                 <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-6">
-                  <a
-                    href="#"
-                    className="text-sm font-medium text-gray-700 hover:text-gray-800"
-                  >
-                    Sign in
-                  </a>
-                  <span className="h-6 w-px bg-gray-200" aria-hidden="true" />
-                  <a
-                    href="#"
-                    className="text-sm font-medium text-gray-700 hover:text-gray-800"
-                  >
-                    Create account
-                  </a>
-                </div>
-
-                <div className="hidden lg:ml-8 lg:flex">
-                  <a
-                    href="#"
-                    className="flex items-center text-gray-700 hover:text-gray-800"
-                  >
-                    <img
-                      src="https://tailwindui.com/img/flags/flag-canada.svg"
-                      alt=""
-                      className="block h-auto w-5 flex-shrink-0"
-                    />
-                    <span className="ml-3 block text-sm font-medium">CAD</span>
-                    <span className="sr-only">, change currency</span>
-                  </a>
+                  {auth.user?.firstName ? (
+                    <div>
+                      <Avatar
+                        className="text-white"
+                        onClick={handleUserClick}
+                        aria-controls={open ? "basic-menu" : undefined}
+                        aria-haspopup="true"
+                        aria-expanded={open ? "true" : undefined}
+                        style={{
+                          backgroundColor: "blue",
+                          color: "white",
+                          cursor: "pointer",
+                        }}
+                      >
+                        {auth.user?.firstName[0].toUpperCase()}
+                      </Avatar>
+                      <Menu
+                        id="basic-menu"
+                        anchorEl={anchorEl}
+                        open={openUserMenu}
+                        onClose={handleCloseUserMenu}
+                        MenuListProps={{ "aria-labelledby": "basic-button" }}
+                      >
+                        <MenuItem onClick={() => handleGoToProfile()}>
+                          Profile
+                        </MenuItem>
+                        <MenuItem onClick={() => handleGoToOrder()}>
+                          My Orders
+                        </MenuItem>
+                        <MenuItem onClick={handleLogout}>Log out</MenuItem>
+                      </Menu>
+                    </div>
+                  ) : (
+                    <Button
+                      onClick={handleOpen}
+                      className="text-sm font-medium text-gray-700 hover:text-gray-800"
+                    >
+                      SignIn
+                    </Button>
+                  )}
                 </div>
 
                 {/* Search */}
+
                 <div className="flex lg:ml-6">
-                  <a href="#" className="p-2 text-gray-400 hover:text-gray-500">
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    className="p-2 text-gry-400 hover:text-gray-500"
+                    value={searchQuery}
+                    onChange={handleSearchInputChange}
+                  />
+                  <button
+                    onClick={handleSearch}
+                    className="p-2 text-gry-400 hover:text-gray-500"
+                  >
                     <span className="sr-only">Search</span>
                     <MagnifyingGlassIcon
                       className="h-6 w-6"
                       aria-hidden="true"
                     />
-                  </a>
+                  </button>
+                  {/* Display search suggestions */}
+                  {!isClosed && searchSuggestions.length > 0 && (
+                    <div className="absolute z-10 mt-2 bg-white border border-gray-300 rounded-md shadow-lg">
+                      {searchSuggestions.map((suggestion) => (
+                        <div
+                          key={suggestion._id}
+                          className="p-2 hover:bg-gray-100"
+                        >
+                          {/* You can customize how each suggestion is displayed */}
+                          {suggestion.title}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* Cart */}
                 <div className="ml-4 flow-root lg:ml-6">
-                  <a href="#" className="group -m-2 flex items-center p-2">
+                  <Button
+                    className="ml-4 flow-root items-center p-2"
+                    onClick={handleGoToCart}
+                  >
                     <ShoppingBagIcon
                       className="h-6 w-6 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
                       aria-hidden="true"
                     />
                     <span className="ml-2 text-sm font-medium text-gray-700 group-hover:text-gray-800">
-                      0
+                      {cart.totalItem ? cart.totalItem : 0}
                     </span>
                     <span className="sr-only">items in cart, view bag</span>
-                  </a>
+                  </Button>
                 </div>
               </div>
             </div>
           </div>
         </nav>
       </header>
+      <AuthModal handleClose={handleClose} open={openAuthModel} />
     </div>
   );
 }
