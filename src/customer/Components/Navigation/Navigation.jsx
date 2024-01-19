@@ -31,42 +31,86 @@ export default function Navigation() {
   const { auth, cart, products } = useSelector((store) => store);
   const dispatch = useDispatch();
   const location = useLocation();
+
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchSuggestions, setSearchSuggestions] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+
+  useEffect(() => {
+    const data = {
+      category: "",
+      colors: [],
+      size: [],
+      minPrice: 0,
+      maxPrice: 1000000,
+      minDiscount: 0,
+      sort: "price_low",
+      pageNumber: 1,
+      pageSize: 10,
+      stock: "",
+    };
+
+    dispatch(findProducts(data));
+  }, [products.deletedproduct, dispatch]);
 
   const handleSearchInputChange = (e) => {
     const searchQuery = e.target.value;
     setSearchQuery(searchQuery);
+
+    // Update filtered products in state based on the search query
+    const updatedFilteredProducts = products?.products?.content?.filter(
+      (product) =>
+        product.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredProducts(updatedFilteredProducts);
+
     setIsClosed(false);
   };
+
   const handleSearch = () => {
     console.log("Perform search for:", searchQuery);
+
+    // You can use the same logic to update filtered products in the handleSearch function
+    const updatedFilteredProducts = products?.content?.filter((product) =>
+      product.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredProducts(updatedFilteredProducts);
+
     setIsClosed(true);
   };
+
+  console.log("filteredProducts", filteredProducts);
+
   const close = () => {
     setIsClosed(true);
   };
+
   const handleUserClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleCloseUserMenu = (event) => {
     setAnchorEl(null);
   };
+
   const handleOpen = () => {
     setOpenAuthModel(true);
   };
+
   const handleClose = () => {
     setOpenAuthModel(false);
   };
+
   const handleCategoryChange = (category, section, item, close) => {
     navigate(`/${category.id}/${section.id}/${item.id}`);
     close();
   };
+
   useEffect(() => {
     if (jwt) {
       dispatch(getUser(jwt));
     }
   }, [jwt, auth.jwt, dispatch]);
+
   useEffect(() => {
     if (auth.user) {
       handleClose();
@@ -75,27 +119,34 @@ export default function Navigation() {
       navigate("/");
     }
   }, [auth.user, navigate, location.pathname]);
+
   useEffect(() => {
     dispatch(getCart());
   }, [cart.updateCartItem, cart.deleteCartItem, dispatch]);
+
   const handleLogout = () => {
     dispatch(logout());
     handleCloseUserMenu();
   };
+
   const handleGoToCart = () => {
     navigate("/cart");
   };
+
   const handleGoToProfile = () => {
     navigate(`/profile/${auth.user._id}`);
     handleCloseUserMenu();
   };
+
   const handleHome = () => {
     navigate("/");
   };
+
   const handleGoToOrder = () => {
     navigate(`/account/order/user/${auth.user._id}`);
     handleCloseUserMenu();
   };
+
   return (
     <div className="bg-white z-50 relative">
       {/* Mobile menu */}
@@ -444,56 +495,13 @@ export default function Navigation() {
               </Popover.Group>
 
               <div className="ml-auto flex items-center">
-                <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-6">
-                  {auth.user?.firstName ? (
-                    <div>
-                      <Avatar
-                        className="text-white"
-                        onClick={handleUserClick}
-                        aria-controls={open ? "basic-menu" : undefined}
-                        aria-haspopup="true"
-                        aria-expanded={open ? "true" : undefined}
-                        style={{
-                          backgroundColor: "blue",
-                          color: "white",
-                          cursor: "pointer",
-                        }}
-                      >
-                        {auth.user?.firstName[0].toUpperCase()}
-                      </Avatar>
-                      <Menu
-                        id="basic-menu"
-                        anchorEl={anchorEl}
-                        open={openUserMenu}
-                        onClose={handleCloseUserMenu}
-                        MenuListProps={{ "aria-labelledby": "basic-button" }}
-                      >
-                        <MenuItem onClick={() => handleGoToProfile()}>
-                          Profile
-                        </MenuItem>
-                        <MenuItem onClick={() => handleGoToOrder()}>
-                          My Orders
-                        </MenuItem>
-                        <MenuItem onClick={handleLogout}>Log out</MenuItem>
-                      </Menu>
-                    </div>
-                  ) : (
-                    <Button
-                      onClick={handleOpen}
-                      className="text-sm font-medium text-gray-700 hover:text-gray-800"
-                    >
-                      SignIn
-                    </Button>
-                  )}
-                </div>
-
                 {/* Search */}
 
                 <div className="flex lg:ml-6">
                   <input
                     type="text"
                     placeholder="Search..."
-                    className="p-2 text-gry-400 hover:text-gray-500"
+                    className="p-2 text-gry-400 hover:text-gray-500 w-[35rem]"
                     value={searchQuery}
                     onChange={handleSearchInputChange}
                   />
@@ -503,41 +511,95 @@ export default function Navigation() {
                   >
                     <span className="sr-only">Search</span>
                     <MagnifyingGlassIcon
-                      className="h-6 w-6"
+                      className="h-6 w-6 mr-2"
                       aria-hidden="true"
                     />
                   </button>
                   {/* Display search suggestions */}
-                  {!isClosed && searchSuggestions.length > 0 && (
-                    <div className="absolute z-10 mt-2 bg-white border border-gray-300 rounded-md shadow-lg">
-                      {searchSuggestions.map((suggestion) => (
-                        <div
-                          key={suggestion._id}
-                          className="p-2 hover:bg-gray-100"
-                        >
-                          {/* You can customize how each suggestion is displayed */}
-                          {suggestion.title}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                  {searchQuery &&
+                    (filteredProducts.length > 0 ? (
+                      <div className="absolute z-10 mt-9 p-4 w-[35rem] bg-white border border-gray-300 rounded-md shadow-lg">
+                        {filteredProducts.map((product) => (
+                          <div
+                            className="flex justify-stretch items-center hover:underline cursor-pointer"
+                            key={product._id}
+                            onClick={() => navigate(`/product/${product._id}`)}
+                          >
+                            <Avatar src={product.imageUrl} className="m-2" />
+                            {product.title.length > 100 ? (
+                              <span title={product.title}>
+                                {product.title.slice(0, 100)}...
+                              </span>
+                            ) : (
+                              product.title
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="absolute z-10 mt-9 p-4 w-[15rem] bg-white border border-gray-300 rounded-md shadow-lg">
+                        No products found.
+                      </p>
+                    ))}
 
-                {/* Cart */}
-                <div className="ml-4 flow-root lg:ml-6">
-                  <Button
-                    className="ml-4 flow-root items-center p-2"
-                    onClick={handleGoToCart}
-                  >
-                    <ShoppingBagIcon
-                      className="h-6 w-6 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
-                      aria-hidden="true"
-                    />
-                    <span className="ml-2 text-sm font-medium text-gray-700 group-hover:text-gray-800">
-                      {cart.totalItem ? cart.totalItem : 0}
-                    </span>
-                    <span className="sr-only">items in cart, view bag</span>
-                  </Button>
+                  <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-6">
+                    {auth.user?.firstName ? (
+                      <div>
+                        <Avatar
+                          className="text-white"
+                          onClick={handleUserClick}
+                          aria-controls={open ? "basic-menu" : undefined}
+                          aria-haspopup="true"
+                          aria-expanded={open ? "true" : undefined}
+                          style={{
+                            backgroundColor: "blue",
+                            color: "white",
+                            cursor: "pointer",
+                          }}
+                        >
+                          {auth.user?.firstName[0].toUpperCase()}
+                        </Avatar>
+                        <Menu
+                          id="basic-menu"
+                          anchorEl={anchorEl}
+                          open={openUserMenu}
+                          onClose={handleCloseUserMenu}
+                          MenuListProps={{ "aria-labelledby": "basic-button" }}
+                        >
+                          <MenuItem onClick={() => handleGoToProfile()}>
+                            Profile
+                          </MenuItem>
+                          <MenuItem onClick={() => handleGoToOrder()}>
+                            My Orders
+                          </MenuItem>
+                          <MenuItem onClick={handleLogout}>Log out</MenuItem>
+                        </Menu>
+                      </div>
+                    ) : (
+                      <Button
+                        onClick={handleOpen}
+                        className="text-sm font-medium text-gray-700 hover:text-gray-800"
+                      >
+                        SignIn
+                      </Button>
+                    )}
+                  </div>
+                  {/* Cart */}
+                  <div className="ml-4 flow-root lg:ml-6">
+                    <Button
+                      className="ml-4 flow-root items-center p-2"
+                      onClick={handleGoToCart}
+                    >
+                      <ShoppingBagIcon
+                        className="h-6 w-6 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
+                        aria-hidden="true"
+                      />
+                      <span className="ml-2 text-sm font-medium text-gray-700 group-hover:text-gray-800">
+                        {cart.totalItem ? cart.totalItem : 0}
+                      </span>
+                      <span className="sr-only">items in cart, view bag</span>
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
