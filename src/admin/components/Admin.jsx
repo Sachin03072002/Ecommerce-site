@@ -30,9 +30,6 @@ const menu = [
   { name: "AddProduct", path: "/admin/product/create", icon: <AddCardIcon /> },
 ];
 const Admin = () => {
-  const theme = useTheme();
-  const isLargeScreen = useMediaQuery(theme.breakpoints.up("lg"));
-  const [sideBarVisible, setSideBarVisible] = useState(false);
   const navigate = useNavigate();
 
   const drawer = (

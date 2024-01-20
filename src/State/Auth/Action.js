@@ -2,7 +2,7 @@ import axios from "axios";
 import { API_BASE_URL } from "../../config/apiConfig";
 import { GET_ALL_USER_FAILURE, GET_ALL_USER_REQUEST, GET_ALL_USER_SUCCESS, GET_USER_FAILURE, GET_USER_REQUEST, GET_USER_SUCCESS, LOGIN_FAILURE, LOGIN_REQUEST, LOGIN_SUCCESS, LOGOUT, REGISTER_FAILURE, REGISTER_REQUEST, REGISTER_SUCCESS } from "./ActionType";
 
-const token = localStorage.getItem("jwt");
+
 const registerRequest = () => ({ type: REGISTER_REQUEST });
 const registerSuccess = (user) => ({ type: REGISTER_SUCCESS, payload: user });
 const registerFailure = (error) => ({ type: REGISTER_FAILURE, payload: error });
@@ -16,11 +16,9 @@ export const register = (userData) => async (dispatch) => {
         if (user.jwt) {
             localStorage.setItem("jwt", user.jwt);
         }
-        // console.log("user", user);
+
         dispatch(registerSuccess(user.jwt));
     } catch (error) {
-        console.error("API call failed:", error);
-        console.log("Axios response:", error.response)
         dispatch(registerFailure(error.message));
     }
 }
@@ -38,11 +36,9 @@ export const login = (userData) => async (dispatch) => {
         if (user.token) {
             localStorage.setItem("jwt", user.token);
         }
-        console.log("user", user);
+
         dispatch(loginSuccess(user.jwt));
     } catch (error) {
-        console.error("API call failed:", error);
-        console.log("Axios response:", error.response)
         dispatch(loginFailure(error.message));
     }
 }
@@ -63,11 +59,9 @@ export const getUser = (jwt) => async (dispatch) => {
         });
         const user = response.data;
 
-        console.log("user", user);
+
         dispatch(getUserSuccess(user));
     } catch (error) {
-        console.error("API call failed:", error);
-        console.log("Axios response:", error.response)
         dispatch(getUserFailure(error.message));
     }
 }
@@ -94,8 +88,6 @@ export const getAllUser = (jwt) => async (dispatch) => {
         const user = response.data;
         dispatch(getAllUserSuccess(user));
     } catch (error) {
-        console.error("API call failed:", error);
-        console.log("Axios response:", error.response)
         dispatch(getAllUserFailure(error.message));
     }
 }

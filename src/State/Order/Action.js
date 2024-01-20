@@ -44,7 +44,7 @@ export const getOrdersByUserId = (userId) => async (dispatch) => {
     dispatch({ type: GET_ORDERS_BY_USER_ID_REQUEST });
     try {
         const { data } = await api.get(`${API_BASE_URL}/api/orders/user/${userId}`);
-        console.log("orders by user", data);
+
         dispatch({ type: GET_ORDERS_BY_USER_ID_SUCCESS, payload: data });
     } catch (error) {
         dispatch({ type: GET_ORDERS_BY_USER_ID_FAILURE, error: error.message });

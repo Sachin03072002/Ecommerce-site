@@ -1,20 +1,11 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  confirmOrder,
-  deleteOrder,
-  deliverOrder,
-  getOrders,
-  shipOrder,
-} from "../../State/Admin/Order/Action";
+import { getOrders } from "../../State/Admin/Order/Action";
 import {
   Avatar,
   AvatarGroup,
-  Button,
   Card,
   CardHeader,
-  Menu,
-  MenuItem,
   Paper,
   Table,
   TableBody,
@@ -35,6 +26,7 @@ const OrderTable = () => {
     adminOrder.placed,
     adminOrder.shipped,
     adminOrder.deletedOrders,
+    dispatch,
   ]);
   console.log("admin orders", adminOrder);
 

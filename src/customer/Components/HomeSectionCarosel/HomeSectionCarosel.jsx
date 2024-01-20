@@ -1,13 +1,12 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import AliceCarousel from "react-alice-carousel";
 import HomeSectionCard from "../HomeSectionCard/HomeSectionCard";
 import { Button } from "@mui/material";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import { useNavigate } from "react-router-dom";
 
 const HomeSectionCarosel = ({ data, sectionName }) => {
   const carouselRef = useRef(null);
-  const navigate = useNavigate();
+
   const [activeIndex, setActiveIndex] = useState(0);
 
   const responsive = {

@@ -32,7 +32,7 @@ export default function ProductTable() {
     };
 
     dispatch(findProducts(data));
-  }, [products.deletedproduct]);
+  }, [products.deletedproduct, dispatch]);
   return (
     <div className="p-5 overflow-x-hidden overflow-y-scroll h-[100vh]">
       <Card className="mt-2">

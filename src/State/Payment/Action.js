@@ -19,7 +19,7 @@ export const updatePayment = (reqData) => async (dispatch) => {
     dispatch({ type: UPDATE_PAYMENT_REQUEST });
     try {
         const { data } = await api.get(`api/payments?payment_id=${reqData.paymentId}&orderId=${reqData.orderId}`);
-        console.log("update payment: ", data);
+
     } catch (error) {
         console.error("Razorpay API Error:", error.response.data);
         dispatch({ type: CREATE_PAYMENT_FAILURE, payload: error.message });

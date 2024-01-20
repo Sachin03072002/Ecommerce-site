@@ -10,9 +10,9 @@ export const createRating = (productId, value, reviewText) => async (dispatch) =
             rating: value,
             review: reviewText,
         };
-        console.log("data", requestData);
+
         const { data } = await api.post(`/api/ratings/create`, requestData);
-        console.log("created rate", data);
+
 
         dispatch({
             type: SUBMIT_REVIEW_SUCCESS,
@@ -29,7 +29,7 @@ export const getAllRatingsReviews = (productId) => async (dispatch) => {
 
     try {
         const { data } = await api.get(`/api/ratings/product/${productId.toString()}`);
-        console.log("Fetched all ratings and reviews", data);
+
 
         dispatch({
             type: GET_ALL_RATINGS_REVIEWS_SUCCESS,

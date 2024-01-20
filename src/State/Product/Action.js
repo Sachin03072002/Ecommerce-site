@@ -7,7 +7,7 @@ export const findProducts = (reqData) => async (dispatch) => {
     const { colors, size, minPrice, maxPrice, minDiscount, category, stock, sort, pageNumber, pageSize } = reqData;
     try {
         const { data } = await api.get(`${API_BASE_URL}/api/products?color=${colors}&size=${size}&minPrice=${minPrice}&maxPrice=${maxPrice}&category=${category}&stock=${stock}&sort=${sort}&pageNumber=${pageNumber}&pageSize=${pageSize}`);
-        console.log("product data", data);
+
         dispatch({ type: FIND_PRODUCTS_SUCCESS, payload: data });
     } catch (error) {
         console.log(error.message);
@@ -22,7 +22,7 @@ export const findProductsById = (reqData) => async (dispatch) => {
     const { productId } = reqData;
     try {
         const { data } = await api.get(`/api/products/id/${productId}`);
-        console.log("Id data:", data);
+
         dispatch({ type: FIND_PRODUCT_BY_ID_SUCCESS, payload: data });
     } catch (error) {
         dispatch({ type: FIND_PRODUCT_BY_ID_FAILURE, payload: error.message });
@@ -33,7 +33,7 @@ export const createProduct = (product) => async (dispatch) => {
     try {
         dispatch({ type: CREATE_PRODUCT_REQUEST })
         const { data } = await api.post(`/api/admin/products`, product);
-        console.log("created product", data);
+
         dispatch({
             type: CREATE_PRODUCT_SUCCESS, payload: data,
         })
@@ -46,7 +46,7 @@ export const deleteProduct = (productId) => async (dispatch) => {
     try {
         dispatch({ type: DELETE_PRODUCTS_REQUEST })
         const { data } = await api.delete(`${API_BASE_URL}/api/admin/products/${productId}`);
-        console.log("delete: ", data);
+
         dispatch({
             type: DELETE_PRODUCTS_SUCCESS, payload: productId,
         })

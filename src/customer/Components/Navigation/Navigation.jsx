@@ -8,13 +8,13 @@ import {
 } from "@heroicons/react/24/outline";
 
 import { navigation } from "./navigationData";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Avatar, Button, Menu, MenuItem } from "@mui/material";
 import AuthModal from "../../auth/AuthModal";
 import { useDispatch, useSelector } from "react-redux";
 import { getUser, logout } from "../../../State/Auth/Action";
 import { getCart } from "../../../State/Cart/Action";
-import { findProducts, getAllProducts } from "../../../State/Product/Action";
+import { findProducts } from "../../../State/Product/Action";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -23,14 +23,13 @@ function classNames(...classes) {
 export default function Navigation() {
   const [open, setOpen] = useState(false);
   const [openAuthModel, setOpenAuthModel] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null);
+  const [anchorEl, setAnchorEl] = useState();
   const [isClosed, setIsClosed] = useState(false);
   const openUserMenu = Boolean(anchorEl);
   const navigate = useNavigate();
   const jwt = localStorage.getItem("jwt");
   const { auth, cart, products } = useSelector((store) => store);
   const dispatch = useDispatch();
-  const location = useLocation();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -143,22 +142,12 @@ export default function Navigation() {
     navigate(`/account/order/user/${auth.user._id}`);
     handleCloseUserMenu();
   };
-  const handleUserClickMobile = () => {
-    setOpen(false); // Close mobile menu
-    setAnchorEl(auth.user ? true : null); // Open user menu
-  };
-  const handleCloseUserMenuMobile = () => {
-    setAnchorEl(null); // Close user menu
-  };
+
   return (
-    <div className="bg-white z-999 relative">
+    <div className="bg-white z-50 relative">
       {/* Mobile menu */}
       <Transition.Root show={open} as={Fragment}>
-        <Dialog
-          as="div"
-          className="relative z-40 lg:hidden"
-          onClose={() => setOpen(false)}
-        >
+        <Dialog as="div" className="relative z-40 lg:hidden" onClose={setOpen}>
           <Transition.Child
             as={Fragment}
             enter="transition-opacity ease-linear duration-300"
@@ -186,7 +175,7 @@ export default function Navigation() {
                   <button
                     type="button"
                     className="relative -m-2 inline-flex items-center justify-center rounded-md p-2 text-gray-400"
-                    onClick={() => setOpen(false)}
+                    onClick={setOpen}
                   >
                     <span className="absolute -inset-0.5" />
                     <span className="sr-only">Close menu</span>
@@ -310,20 +299,6 @@ export default function Navigation() {
                       Create account
                     </Button>
                   )}
-                </div>
-
-                <div className="border-t border-gray-200 px-4 py-6">
-                  <a href="#" className="-m-2 flex items-center p-2">
-                    <img
-                      src="https://tailwindui.com/img/flags/flag-canada.svg"
-                      alt=""
-                      className="block h-auto w-5 flex-shrink-0"
-                    />
-                    <span className="ml-3 block text-base font-medium text-gray-900">
-                      CAD
-                    </span>
-                    <span className="sr-only">, change currency</span>
-                  </a>
                 </div>
               </Dialog.Panel>
             </Transition.Child>
