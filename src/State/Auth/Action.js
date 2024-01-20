@@ -8,7 +8,6 @@ const registerSuccess = (user) => ({ type: REGISTER_SUCCESS, payload: user });
 const registerFailure = (error) => ({ type: REGISTER_FAILURE, payload: error });
 
 
-
 export const register = (userData) => async (dispatch) => {
     dispatch(registerRequest());
     try {
@@ -39,7 +38,7 @@ export const login = (userData) => async (dispatch) => {
         if (user.token) {
             localStorage.setItem("jwt", user.token);
         }
-        // console.log("user", user);
+        console.log("user", user);
         dispatch(loginSuccess(user.jwt));
     } catch (error) {
         console.error("API call failed:", error);

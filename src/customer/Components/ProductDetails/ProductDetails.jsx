@@ -6,9 +6,10 @@ import { mens_kurta } from "../../../Data/mens_kurta";
 import HomeSectionCard from "../HomeSectionCard/HomeSectionCard";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { findProductsById } from "../../../State/Product/Action";
+import { findProducts, findProductsById } from "../../../State/Product/Action";
 import { addItemToCart } from "../../../State/Cart/Action";
 import { getAllRatingsReviews } from "../../../State/Rating/Action";
+import ProductSectionCard from "../Product/ProductSectionCard";
 
 const product = {
   sizes: [
@@ -124,6 +125,32 @@ export default function ProductDetails() {
   const { averageRating, ratingDistribution, percentageDistribution } =
     calculateRatingDistribution(ratings);
   console.log("average", ratings);
+  const categories = [
+    "kurtas",
+    "mens_shoes",
+    "mens_shirts",
+    "womens_saree",
+    "womens_dress",
+  ];
+  useEffect(() => {
+    // Fetch products for each category
+    categories.forEach((category) => {
+      const data = {
+        category,
+        colors: [],
+        size: [],
+        minPrice: 0,
+        maxPrice: 1000000,
+        minDiscount: 0,
+        sort: "price_low",
+        pageNumber: 1,
+        pageSize: 10,
+        stock: "",
+      };
+
+      dispatch(findProducts(data));
+    });
+  }, []);
   return (
     <div className="bg-white lg:px-20">
       <div className="pt-6">
@@ -328,69 +355,64 @@ export default function ProductDetails() {
           </div>
         </section>
         {/* rating and reviews  */}
-        <section>
+        <section className="pt-10">
           <h1 className="font-semibold text-lg pb-4">Recent Review & Rating</h1>
-          <div className="border p-5">
-            <Grid container spacing={7}>
-              <Grid item sx={7}>
-                <div className="space-y-5">
-                  {rating.ratingsReviews.ratings?.map((item) => (
-                    <ProductReviewCard key={item.id} item={item} />
-                  ))}
-                </div>
-              </Grid>
-              <Grid item xs={5}>
-                <h1 className="text-xl font-semibold pb-2">Product Ratings</h1>
-
-                <div className="flex items-center space-x-3">
-                  <Rating value={averageRating} precision={0.5} readOnly />
-                  <p className="opacity-60">{rating.length} Ratings</p>
-                </div>
-                <Box className="mt-5 space-y-3">
-                  {Object.keys(percentageDistribution).map((ratingLevel) => (
-                    <Grid
-                      container
-                      alignItems="center"
-                      gap={3}
-                      key={ratingLevel}
-                    >
-                      <Grid item xs={2}>
-                        <p>
-                          {ratingLevel.charAt(0).toUpperCase() +
-                            ratingLevel.slice(1)}
-                        </p>
-                      </Grid>
-                      <Grid item xs={7}>
-                        <LinearProgress
-                          sx={{
-                            bgColor: "#d0d0d0",
-                            borderRadius: 4,
-                            height: 7,
-                          }}
-                          variant="determinate"
-                          value={percentageDistribution[ratingLevel]}
-                          color={
-                            ratingLevel === "excellent"
-                              ? "success"
-                              : ratingLevel === "poor"
-                              ? "error"
-                              : "warning"
-                          }
-                        />
-                      </Grid>
+          <div className="border p-5 space-y-5 md:flex md:space-y-0">
+            <div className="md:w-7/12">
+              <div className="space-y-5">
+                {rating.ratingsReviews.ratings?.map((item) => (
+                  <ProductReviewCard key={item.id} item={item} />
+                ))}
+              </div>
+            </div>
+            <div className="md:w-5/12">
+              <h1 className="text-xl font-semibold pb-2">Product Ratings</h1>
+              <div className="flex flex-col md:flex-row items-center md:space-x-3">
+                <Rating value={averageRating} precision={0.5} readOnly />
+                <p className="opacity-60 mt-2 md:mt-0">
+                  {rating.length} Ratings
+                </p>
+              </div>
+              <Box className="mt-5 space-y-3">
+                {Object.keys(percentageDistribution).map((ratingLevel) => (
+                  <Grid container alignItems="center" gap={3} key={ratingLevel}>
+                    <Grid item xs={2}>
+                      <p>
+                        {ratingLevel.charAt(0).toUpperCase() +
+                          ratingLevel.slice(1)}
+                      </p>
                     </Grid>
-                  ))}
-                </Box>
-              </Grid>
-            </Grid>
+                    <Grid item xs={10} md={7}>
+                      <LinearProgress
+                        sx={{
+                          bgColor: "#d0d0d0",
+                          borderRadius: 4,
+                          height: 7,
+                        }}
+                        variant="determinate"
+                        value={percentageDistribution[ratingLevel]}
+                        color={
+                          ratingLevel === "excellent"
+                            ? "success"
+                            : ratingLevel === "poor"
+                            ? "error"
+                            : "warning"
+                        }
+                      />
+                    </Grid>
+                  </Grid>
+                ))}
+              </Box>
+            </div>
           </div>
         </section>
+
         {/* similar products  */}
         <section className="pt-10">
-          <h1 className="py-5 text-xl font-bold ">Similar Products</h1>
+          <h1 className="py-5 text-xl font-bold">Similar Products</h1>
           <div className="flex flex-wrap space-y-5">
-            {mens_kurta.map((item) => (
-              <HomeSectionCard product={item} />
+            {products?.products?.content?.slice(0, 20).map((item) => (
+              <ProductSectionCard key={item.id} product={item} />
             ))}
           </div>
         </section>

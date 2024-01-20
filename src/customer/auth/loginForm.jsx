@@ -7,6 +7,7 @@ import { login } from "../../State/Auth/Action";
 const LoginForm = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -15,10 +16,11 @@ const LoginForm = () => {
       password: data.get("password"),
     };
     dispatch(login(userData));
+    navigate("/");
   };
 
   return (
-    <div>
+    <div className="p-4">
       <form onSubmit={handleSubmit}>
         <Grid container spacing={3}>
           <Grid item xs={12}>
@@ -29,7 +31,7 @@ const LoginForm = () => {
               label="Email"
               fullWidth
               autoComplete="email"
-            ></TextField>
+            />
           </Grid>
           <Grid item xs={12}>
             <TextField
@@ -39,32 +41,31 @@ const LoginForm = () => {
               label="Password"
               fullWidth
               autoComplete="password"
-            ></TextField>
+              type="password"
+            />
           </Grid>
           <Grid item xs={12}>
             <Button
-              className="bg-[#380e86] w-full"
+              className="w-full"
               type="submit"
-              contained
               size="large"
-              sx={{ padding: ".8rem 0", bgColor: "#380e86" }}
+              sx={{ padding: ".8rem 0" }}
+              style={{ backgroundColor: "#380e86", color: "#fff" }}
             >
               Login
             </Button>
           </Grid>
         </Grid>
       </form>
-      <div className="flex justify-center flex-col items-center">
-        <div className="py-3 flex items-center">
-          <p>If you have don't have account ? </p>
-          <Button
-            onClick={() => navigate("/register")}
-            className="ml-5 "
-            size="small"
-          >
-            register
-          </Button>
-        </div>
+      <div className="mt-3 text-center">
+        <p className="mb-2">If you don't have an account?</p>
+        <Button
+          onClick={() => navigate("/register")}
+          size="small"
+          style={{ color: "#380e86" }}
+        >
+          Register
+        </Button>
       </div>
     </div>
   );

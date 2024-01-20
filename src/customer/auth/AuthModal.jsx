@@ -16,6 +16,7 @@ const style = {
 };
 const AuthModal = ({ handleClose, open }) => {
   const location = useLocation();
+  console.log("locc", location.pathname);
   return (
     <div>
       <Modal

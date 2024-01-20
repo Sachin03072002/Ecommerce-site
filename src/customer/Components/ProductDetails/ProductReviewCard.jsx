@@ -2,8 +2,6 @@ import { Avatar, Box, Grid, Rating } from "@mui/material";
 import React from "react";
 
 const ProductReviewCard = ({ item }) => {
-  console.log("item", item);
-
   const formatDate = (inputDate) => {
     const options = { month: "long", day: "numeric", year: "numeric" };
     const date = new Date(inputDate);

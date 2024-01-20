@@ -115,10 +115,7 @@ export default function Navigation() {
     if (auth.user) {
       handleClose();
     }
-    if (location.pathname === "/login" || location.pathname === "/register") {
-      navigate("/");
-    }
-  }, [auth.user, navigate, location.pathname]);
+  }, [auth.user, navigate]);
 
   useEffect(() => {
     dispatch(getCart());
@@ -146,12 +143,22 @@ export default function Navigation() {
     navigate(`/account/order/user/${auth.user._id}`);
     handleCloseUserMenu();
   };
-
+  const handleUserClickMobile = () => {
+    setOpen(false); // Close mobile menu
+    setAnchorEl(auth.user ? true : null); // Open user menu
+  };
+  const handleCloseUserMenuMobile = () => {
+    setAnchorEl(null); // Close user menu
+  };
   return (
-    <div className="bg-white z-50 relative">
+    <div className="bg-white z-999 relative">
       {/* Mobile menu */}
       <Transition.Root show={open} as={Fragment}>
-        <Dialog as="div" className="relative z-40 lg:hidden" onClose={setOpen}>
+        <Dialog
+          as="div"
+          className="relative z-40 lg:hidden"
+          onClose={() => setOpen(false)}
+        >
           <Transition.Child
             as={Fragment}
             enter="transition-opacity ease-linear duration-300"
@@ -287,23 +294,22 @@ export default function Navigation() {
                   ))}
                 </div>
 
-                <div className="space-y-6 border-t border-gray-200 px-4 py-6">
-                  <div className="flow-root">
-                    <a
-                      href="#"
+                <div className="flow-root">
+                  {auth.user?.firstName ? (
+                    <Button
+                      onClick={handleLogout}
                       className="-m-2 block p-2 font-medium text-gray-900"
                     >
-                      Sign in
-                    </a>
-                  </div>
-                  <div className="flow-root">
-                    <a
-                      href="#"
+                      Logout
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={handleOpen}
                       className="-m-2 block p-2 font-medium text-gray-900"
                     >
                       Create account
-                    </a>
-                  </div>
+                    </Button>
+                  )}
                 </div>
 
                 <div className="border-t border-gray-200 px-4 py-6">

@@ -8,7 +8,8 @@ const RegisterForm = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const jwt = localStorage.getItem("jwt");
-  const { auth } = useSelector((store) => store);
+  const auth = useSelector((store) => store.auth);
+
   useEffect(() => {
     if (jwt) {
       dispatch(getUser(jwt));
@@ -26,8 +27,9 @@ const RegisterForm = () => {
     };
     dispatch(register(userData));
   };
+
   return (
-    <div>
+    <div className="p-4 sm:p-2">
       <form onSubmit={handleSubmit}>
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6}>
@@ -38,7 +40,7 @@ const RegisterForm = () => {
               label="First Name"
               fullWidth
               autoComplete="given-name"
-            ></TextField>
+            />
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextField
@@ -48,7 +50,7 @@ const RegisterForm = () => {
               label="Last Name"
               fullWidth
               autoComplete="given-name"
-            ></TextField>
+            />
           </Grid>
           <Grid item xs={12}>
             <TextField
@@ -58,7 +60,7 @@ const RegisterForm = () => {
               label="Email"
               fullWidth
               autoComplete="email"
-            ></TextField>
+            />
           </Grid>
           <Grid item xs={12}>
             <TextField
@@ -68,32 +70,30 @@ const RegisterForm = () => {
               label="Password"
               fullWidth
               autoComplete="password"
-            ></TextField>
+              type="password"
+            />
           </Grid>
           <Grid item xs={12}>
             <Button
-              className="bg-[#380e86] w-full"
+              className="w-full"
               type="submit"
-              contained
               size="large"
-              sx={{ padding: ".8rem 0", bgColor: "#380e86" }}
+              style={{ backgroundColor: "#380e86", color: "#fff" }}
             >
               Register
             </Button>
           </Grid>
         </Grid>
       </form>
-      <div className="flex justify-center flex-col items-center">
-        <div className="py-3 flex items-center">
-          <p>If you have already account ? </p>
-          <Button
-            onClick={() => navigate("/login")}
-            className="ml-5 "
-            size="small"
-          >
-            login
-          </Button>
-        </div>
+      <div className="mt-3 text-center">
+        <p className="mb-2">If you already have an account?</p>
+        <Button
+          onClick={() => navigate("/login")}
+          size="small"
+          style={{ color: "#380e86" }}
+        >
+          Login
+        </Button>
       </div>
     </div>
   );

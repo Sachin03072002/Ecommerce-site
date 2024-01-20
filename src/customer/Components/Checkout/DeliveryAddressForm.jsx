@@ -1,29 +1,49 @@
 import { Box, Button, Grid, TextField } from "@mui/material";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import AddressCard from "../AddressCard.jsx/AddressCard";
 import { useDispatch, useSelector } from "react-redux";
 import { createOrder } from "../../../State/Order/Action";
 import { useNavigate } from "react-router-dom";
+import AddressCardForm from "./AddressCardForm";
 
 const DeliveryAddressForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { auth } = useSelector((store) => store);
-  console.log("auth:", auth.user.address);
+  const [selectedAddress, setSelectedAddress] = useState(null);
+
+  useEffect(() => {
+    // Populate the form fields when a new address is selected
+    if (selectedAddress) {
+      const {
+        firstName,
+        lastName,
+        streetAddress,
+        city,
+        state,
+        zipCode,
+        mobile,
+      } = selectedAddress;
+
+      // Set the form field values
+      document.getElementById("firstName").value = firstName;
+      document.getElementById("lastName").value = lastName;
+      document.getElementById("address").value = streetAddress;
+      document.getElementById("city").value = city;
+      document.getElementById("state").value = state;
+      document.getElementById("zipCode").value = zipCode;
+      document.getElementById("phoneNumber").value = mobile;
+    }
+  }, [selectedAddress]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    const data = new FormData(e.currentTarget);
-    const address = {
-      firstName: data.get("firstName"),
-      lastName: data.get("lastName"),
-      streetAddress: data.get("address"),
-      city: data.get("city"),
-      state: data.get("state"),
-      zipCode: data.get("zipCode"),
-      mobile: data.get("phoneNumber"),
-    };
-    const orderData = { address, navigate };
-    dispatch(createOrder(orderData));
+    // Your form submission logic
+  };
+
+  const handleDeliverHere = () => {
+    // Dispatch the selected address to the Redux store
+    dispatch(createOrder({ address: selectedAddress, navigate }));
   };
   return (
     <div>
@@ -36,15 +56,12 @@ const DeliveryAddressForm = () => {
         >
           <div className="p-5 py-5 border-b cursor-pointer">
             {auth.user?.address?.map((item) => (
-              <AddressCard key={item._id} address={item} />
+              <AddressCardForm
+                key={item._id}
+                address={item}
+                onSelectAddress={() => setSelectedAddress(item)}
+              />
             ))}
-            <Button
-              sx={{ mt: 2, bgColor: "RGB(145 85 253)" }}
-              size="large"
-              variant="contained"
-            >
-              Deliver Here
-            </Button>
           </div>
         </Grid>
 
@@ -126,10 +143,10 @@ const DeliveryAddressForm = () => {
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <Button
+                    onClick={handleDeliverHere}
                     sx={{ py: 1.5, mt: 2, bgColor: "RGB(145 85 253)" }}
                     size="large"
                     variant="contained"
-                    type="submit"
                   >
                     Deliver Here
                   </Button>
