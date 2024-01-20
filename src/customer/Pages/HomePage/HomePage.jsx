@@ -6,7 +6,7 @@ import { findProducts } from "../../../State/Product/Action";
 
 function HomePage() {
   const dispatch = useDispatch();
-  const { products } = useSelector((store) => store);
+  const products = useSelector((store) => store.products);
 
   // Array of category names
   const categories = [

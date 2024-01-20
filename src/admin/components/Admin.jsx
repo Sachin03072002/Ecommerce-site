@@ -6,10 +6,8 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  useMediaQuery,
-  useTheme,
 } from "@mui/material";
-import React, { useState } from "react";
+import React from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import Inventory2Icon from "@mui/icons-material/Inventory2";

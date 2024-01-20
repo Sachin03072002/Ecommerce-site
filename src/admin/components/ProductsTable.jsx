@@ -12,7 +12,7 @@ import { Avatar, Button, Card, CardHeader } from "@mui/material";
 
 export default function ProductsTable() {
   const dispatch = useDispatch();
-  const { products } = useSelector((store) => store);
+  const products = useSelector((store) => store.products);
   const handleProductDelete = (productId) => {
     dispatch(deleteProduct(productId));
   };

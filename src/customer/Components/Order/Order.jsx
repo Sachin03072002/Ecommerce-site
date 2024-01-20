@@ -18,7 +18,7 @@ const Order = () => {
   const params = useParams();
   const userId = params.userId;
   const dispatch = useDispatch();
-  const { order } = useSelector((store) => store);
+  const order = useSelector((store) => store.order);
 
   useEffect(() => {
     const fetchData = async () => {

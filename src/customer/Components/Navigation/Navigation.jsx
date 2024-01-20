@@ -28,7 +28,10 @@ export default function Navigation() {
   const openUserMenu = Boolean(anchorEl);
   const navigate = useNavigate();
   const jwt = localStorage.getItem("jwt");
-  const { auth, cart, products } = useSelector((store) => store);
+
+  const auth = useSelector((store) => store.auth);
+  const cart = useSelector((store) => store.cart);
+  const products = useSelector((store) => store.products);
   const dispatch = useDispatch();
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -66,8 +69,6 @@ export default function Navigation() {
   };
 
   const handleSearch = () => {
-    console.log("Perform search for:", searchQuery);
-
     // You can use the same logic to update filtered products in the handleSearch function
     const updatedFilteredProducts = products?.content?.filter((product) =>
       product.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -76,8 +77,6 @@ export default function Navigation() {
 
     setIsClosed(true);
   };
-
-  console.log("filteredProducts", filteredProducts);
 
   const close = () => {
     setIsClosed(true);

@@ -8,7 +8,7 @@ import { getCart } from "../../../State/Cart/Action";
 const Cart = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { cart } = useSelector((store) => store);
+  const cart = useSelector((store) => store.cart);
 
   const handleCheckOut = () => {
     navigate("/checkout?step=2");

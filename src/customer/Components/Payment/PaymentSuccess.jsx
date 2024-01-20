@@ -12,7 +12,7 @@ const PaymentSuccess = () => {
   const [paymentStatus, setPaymentStatus] = useState();
   const { orderId } = useParams();
   const dispatch = useDispatch();
-  const { order } = useSelector((store) => store);
+  const order = useSelector((store) => store.order);
   useEffect(() => {
     const urlParam = new URLSearchParams(window.location.search);
     setPaymentId(urlParam.get("razorpay_payment_id"));

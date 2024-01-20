@@ -9,7 +9,7 @@ import AddressCardForm from "./AddressCardForm";
 const DeliveryAddressForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { auth } = useSelector((store) => store);
+  const auth = useSelector((store) => store.auth);
   const [selectedAddress, setSelectedAddress] = useState(null);
 
   useEffect(() => {

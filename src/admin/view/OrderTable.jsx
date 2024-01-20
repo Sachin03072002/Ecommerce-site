@@ -17,7 +17,7 @@ import {
 
 const OrderTable = () => {
   const dispatch = useDispatch();
-  const { adminOrder } = useSelector((store) => store);
+  const adminOrder = useSelector((store) => store.adminOrder);
   useEffect(() => {
     dispatch(getOrders());
   }, [

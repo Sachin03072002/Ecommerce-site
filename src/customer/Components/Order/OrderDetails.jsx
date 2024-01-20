@@ -10,7 +10,7 @@ import { getOrderById } from "../../../State/Order/Action";
 import { createRating } from "../../../State/Rating/Action";
 
 const OrderDetails = () => {
-  const { order } = useSelector((store) => store);
+  const order = useSelector((store) => store.order);
   const params = useParams();
   const orderId = params.orderId;
   const dispatch = useDispatch();

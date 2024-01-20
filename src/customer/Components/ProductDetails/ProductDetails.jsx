@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { RadioGroup } from "@headlessui/react";
 import { Box, Button, Grid, LinearProgress, Rating } from "@mui/material";
 import ProductReviewCard from "./ProductReviewCard";
-import { mens_kurta } from "../../../Data/mens_kurta";
-import HomeSectionCard from "../HomeSectionCard/HomeSectionCard";
+
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { findProducts, findProductsById } from "../../../State/Product/Action";
@@ -107,7 +106,8 @@ export default function ProductDetails() {
   const navigate = useNavigate();
   const params = useParams();
   const dispatch = useDispatch();
-  const { products, rating } = useSelector((store) => store);
+  const products = useSelector((store) => store.products);
+  const rating = useSelector((store) => store.rating);
 
   const handleAddToCart = () => {
     const data = { productId: params.productId, size: selectedSize.name };

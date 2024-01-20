@@ -47,7 +47,7 @@ export default function Product() {
   const sortValue = searchParams.get("sort");
   const pageNumber = searchParams.get("page") || 1;
   const stock = searchParams.get("stock");
-  const { products } = useSelector((store) => store);
+  const products = useSelector((store) => store.products);
 
   const handlePaginationChange = (event, value) => {
     const searchParams = new URLSearchParams(location.search);

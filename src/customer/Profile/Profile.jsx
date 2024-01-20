@@ -11,7 +11,7 @@ const Profile = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const jwt = localStorage.getItem("jwt");
-  const { auth } = useSelector((store) => store);
+  const auth = useSelector((store) => store.auth);
   useEffect(() => {
     if (jwt) {
       dispatch(getUser(jwt));

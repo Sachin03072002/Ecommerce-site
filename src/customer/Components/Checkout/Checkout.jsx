@@ -18,7 +18,7 @@ export default function Checkout() {
   const querySearch = new URLSearchParams(location.search);
   const step = querySearch.get("step");
   const navigate = useNavigate();
-  const { order } = useSelector((store) => store);
+  const order = useSelector((store) => store.order);
   React.useEffect(() => {
     if (order.orderStatus === "CONFIRMED") {
       navigate(`/payment/${order._id}`);

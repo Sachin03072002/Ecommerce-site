@@ -27,7 +27,7 @@ import {
 const OrdersTable = () => {
   const [anchorEl, setAnchorEl] = React.useState([]);
 
-  const open = Boolean(anchorEl);
+  
   const handleClick = (event, index) => {
     const newAnchorElArray = [...anchorEl];
     newAnchorElArray[index] = event.currentTarget;
@@ -39,7 +39,7 @@ const OrdersTable = () => {
     setAnchorEl(newAnchorElArray);
   };
   const dispatch = useDispatch();
-  const { adminOrder } = useSelector((store) => store);
+  const adminOrder = useSelector((store) => store.adminOrder);
   useEffect(() => {
     dispatch(getOrders());
   }, [
@@ -50,7 +50,6 @@ const OrdersTable = () => {
     adminOrder.deletedOrders,
     dispatch,
   ]);
-  console.log("admin orders", adminOrder);
 
   const handleShippedOrder = (orderId) => {
     dispatch(shipOrder(orderId));

@@ -16,8 +16,6 @@ const OrderCard = ({ item }) => {
     return formattedDate;
   };
 
-  console.log("item", item);
-
   return (
     <div
       onClick={() => navigate(`/account/order/${item._id}`)}

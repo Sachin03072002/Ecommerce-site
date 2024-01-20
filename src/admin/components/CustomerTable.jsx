@@ -12,7 +12,7 @@ import { getAllUser } from "../../State/Auth/Action";
 
 export default function CustomerTable() {
   const dispatch = useDispatch();
-  const { auth } = useSelector((store) => store);
+  const auth = useSelector((store) => store.auth);
   const token = localStorage.getItem("jwt");
 
   useEffect(() => {

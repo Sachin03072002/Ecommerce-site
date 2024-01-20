@@ -12,7 +12,7 @@ const OrderSummary = () => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const orderId = searchParams.get("order_id");
-  const { order } = useSelector((store) => store);
+  const order = useSelector((store) => store.order);
   useEffect(() => {
     dispatch(getOrderById(orderId));
   }, [orderId, dispatch]);
