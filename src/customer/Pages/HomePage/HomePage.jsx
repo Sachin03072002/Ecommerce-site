@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import MainCarosel from "../../Components/HomeCarosel/MainCarosel";
 import HomeSectionCarosel from "../../Components/HomeSectionCarosel/HomeSectionCarosel";
 import { useDispatch, useSelector } from "react-redux";
@@ -8,14 +8,17 @@ function HomePage() {
   const dispatch = useDispatch();
   const products = useSelector((store) => store.products);
 
-  // Array of category names
-  const categories = [
-    "kurtas",
-    "mens_shoes",
-    "mens_shirts",
-    "womens_saree",
-    "womens_dress",
-  ];
+  // Memoized array of category names
+  const categories = useMemo(
+    () => [
+      "kurtas",
+      "mens_shoes",
+      "mens_shirts",
+      "womens_saree",
+      "womens_dress",
+    ],
+    []
+  );
 
   useEffect(() => {
     // Fetch products for each category
@@ -35,7 +38,7 @@ function HomePage() {
 
       dispatch(findProducts(data));
     });
-  }, [dispatch, findProducts]);
+  }, [dispatch, categories]);
 
   return (
     <>
@@ -49,7 +52,7 @@ function HomePage() {
           return (
             categoryProducts && (
               <HomeSectionCarosel
-                key={category}
+                key={category} // Use a unique identifier as the key
                 data={categoryProducts}
                 sectionName={category.toUpperCase()}
               />
