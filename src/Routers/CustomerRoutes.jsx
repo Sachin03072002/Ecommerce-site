@@ -11,7 +11,6 @@ import Order from "../customer/Components/Order/Order";
 import OrderDetails from "../customer/Components/Order/OrderDetails";
 import PaymentSuccess from "../customer/Components/Payment/PaymentSuccess";
 import Profile from "../customer/Profile/Profile";
-import LoginForm from "../customer/auth/loginForm";
 
 const CustomerRoutes = () => {
   return (

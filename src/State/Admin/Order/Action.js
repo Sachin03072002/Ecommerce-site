@@ -64,7 +64,7 @@ export const deleteOrder = (orderId) => {
     return async (dispatch) => {
         try {
             dispatch({ type: DELETE_ORDER_REQUEST });
-            const { data } = await api.delete(`${API_BASE_URL}/api/admin/orders/${orderId}/delete`);
+            await api.delete(`${API_BASE_URL}/api/admin/orders/${orderId}/delete`);
 
 
             dispatch({ type: DELETE_ORDER_SUCCESS, payload: orderId });

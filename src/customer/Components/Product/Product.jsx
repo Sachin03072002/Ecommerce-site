@@ -8,7 +8,7 @@ import {
   PlusIcon,
   Squares2X2Icon,
 } from "@heroicons/react/20/solid";
-import { mens_kurta } from "../../../Data/mens_kurta";
+
 import ProductCard from "./ProductCard";
 import { filters, singleFilter } from "./FilterData";
 import {
@@ -60,7 +60,7 @@ export default function Product() {
     const searchParams = new URLSearchParams(location.search);
     let filterValue = searchParams.getAll(sectionId);
     if (filterValue.length > 0 && filterValue[0].split(",").includes(value)) {
-      filterValue = filterValue[0].split(",").filter((item) => item != value);
+      filterValue = filterValue[0].split(",").filter((item) => item !== value);
       if (filterValue.length === 0) {
         searchParams.delete(sectionId);
       }
@@ -81,9 +81,9 @@ export default function Product() {
     navigate({ search: `?${query}` });
   };
   useEffect(() => {
-    const [minPrice, maxPrice] = (priceValue || "0-1000")
-      .split("-")
-      .map(Number);
+    // const [minPrice, maxPrice] = (priceValue || "0-1000")
+    // .split("-")
+    // .map(Number);
     const data = {
       category: param.levelThree,
       colors: colorValue || [],

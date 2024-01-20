@@ -122,9 +122,10 @@ export default function ProductDetails() {
     dispatch(getAllRatingsReviews(productId));
   }, [params.productId, dispatch]);
   const ratings = rating.ratingsReviews.ratings;
-  const { averageRating, ratingDistribution, percentageDistribution } =
+  const { averageRating, percentageDistribution } =
     calculateRatingDistribution(ratings);
   console.log("average", ratings);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const categories = [
     "kurtas",
     "mens_shoes",
@@ -150,7 +151,7 @@ export default function ProductDetails() {
 
       dispatch(findProducts(data));
     });
-  }, []);
+  }, [categories, dispatch]);
   return (
     <div className="bg-white lg:px-20">
       <div className="pt-6">

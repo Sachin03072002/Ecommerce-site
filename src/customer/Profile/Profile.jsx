@@ -1,13 +1,12 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { getUser } from "../../State/Auth/Action";
 import { Avatar, Button, Grid } from "@mui/material";
 import GradingIcon from "@mui/icons-material/Grading";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 const Profile = () => {
-  const params = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const jwt = localStorage.getItem("jwt");
@@ -79,38 +78,32 @@ const Profile = () => {
       <div className="grid rounded-2xl divide-y divide-dashed hover:divide-solid  justify-evenly bg-gray-50 dark:bg-gray-300 m-3 mt-10 grid-cols-3">
         <div className="col-span-1  p-3">
           <div className="flex flex-col items-center ">
-            <a href="">
-              <Button
-                className="tr-300 flex felx-col"
-                onClick={() => handleGoToOrder()}
-              >
-                <GradingIcon sx={{ height: "3rem", width: "3rem" }} />
-                <span className="text-lg font-medium">My Orders</span>
-              </Button>
-            </a>
+            <Button
+              className="tr-300 flex felx-col"
+              onClick={() => handleGoToOrder()}
+            >
+              <GradingIcon sx={{ height: "3rem", width: "3rem" }} />
+              <span className="text-lg font-medium">My Orders</span>
+            </Button>
           </div>
         </div>
         <div className="col-span-1  p-3">
           <div className="flex flex-col items-center ">
-            <a href="">
-              <Button
-                className="tr-300 flex felx-col"
-                onClick={() => handleGoToCart()}
-              >
-                <ShoppingCartIcon sx={{ height: "3rem", width: "3rem" }} />
-                <span className="text-lg font-medium">My Cart</span>
-              </Button>
-            </a>
+            <Button
+              className="tr-300 flex felx-col"
+              onClick={() => handleGoToCart()}
+            >
+              <ShoppingCartIcon sx={{ height: "3rem", width: "3rem" }} />
+              <span className="text-lg font-medium">My Cart</span>
+            </Button>
           </div>
         </div>
         <div className="col-span-1  p-3">
           <div className="flex flex-col items-center ">
-            <a href="">
-              <Button className="tr-300 flex felx-col">
-                <FavoriteIcon sx={{ height: "3rem", width: "3rem" }} />
-                <span className="text-lg font-medium">WishList</span>
-              </Button>
-            </a>
+            <Button className="tr-300 flex felx-col">
+              <FavoriteIcon sx={{ height: "3rem", width: "3rem" }} />
+              <span className="text-lg font-medium">WishList</span>
+            </Button>
           </div>
         </div>
       </div>
