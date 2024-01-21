@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { RadioGroup } from "@headlessui/react";
 import { Box, Button, Grid, LinearProgress, Rating } from "@mui/material";
 import ProductReviewCard from "./ProductReviewCard";
-
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { findProducts, findProductsById } from "../../../State/Product/Action";
@@ -106,8 +105,7 @@ export default function ProductDetails() {
   const navigate = useNavigate();
   const params = useParams();
   const dispatch = useDispatch();
-  const products = useSelector((store) => store.products);
-  const rating = useSelector((store) => store.rating);
+  const { products, rating } = useSelector((store) => store);
 
   const handleAddToCart = () => {
     const data = { productId: params.productId, size: selectedSize.name };
@@ -125,14 +123,17 @@ export default function ProductDetails() {
   const { averageRating, percentageDistribution } =
     calculateRatingDistribution(ratings);
   console.log("average", ratings);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const categories = [
-    "kurtas",
-    "mens_shoes",
-    "mens_shirts",
-    "womens_saree",
-    "womens_dress",
-  ];
+  const categories = useMemo(
+    () => [
+      "kurtas",
+      "mens_shoes",
+      "mens_shirts",
+      "womens_saree",
+      "womens_dress",
+    ],
+    []
+  );
+
   useEffect(() => {
     // Fetch products for each category
     categories.forEach((category) => {
