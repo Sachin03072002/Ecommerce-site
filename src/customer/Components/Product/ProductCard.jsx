@@ -1,17 +1,34 @@
-import React from "react";
+import React, { useState } from "react";
 import "./ProductCard.css";
 import { useNavigate } from "react-router-dom";
+
 const ProductCard = ({ product }) => {
   const navigate = useNavigate();
+  const [imageLoading, setImageLoading] = useState(true);
+
+  const handleImageLoad = () => {
+    setImageLoading(false);
+  };
 
   return (
     <div
       onClick={() => navigate(`/product/${product?._id}`)}
       className="productCard w-[15rem] m-3 transition-all cursor-pointer"
     >
-      <div className="h-[20rem] ">
+      <div className="h-[20rem] relative">
+        {imageLoading && (
+          <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-white">
+            {/* You can replace this with your preferred loading spinner */}
+            <div className="spinner-border text-primary" role="status">
+              <span className="sr-only">Loading...</span>
+            </div>
+          </div>
+        )}
         <img
-          className="h-full w-full object-cover object-left-top"
+          onLoad={handleImageLoad}
+          className={`h-full w-full object-cover object-left-top ${
+            imageLoading ? "hidden" : ""
+          }`}
           src={product.imageUrl}
           alt=""
         />

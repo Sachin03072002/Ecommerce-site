@@ -34,6 +34,7 @@ function classNames(...classes) {
 
 export default function Product() {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [isloading, setIsLoading] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const param = useParams();
@@ -81,23 +82,28 @@ export default function Product() {
     navigate({ search: `?${query}` });
   };
   useEffect(() => {
-    // const [minPrice, maxPrice] = (priceValue || "0-1000")
-    // .split("-")
-    // .map(Number);
-    const data = {
-      category: param.levelThree,
-      colors: colorValue || [],
-      size: sizeValue || [],
-      minPrice: 0,
-      maxPrice: 10000,
-      minDiscount: discount || null,
-      sort: sortValue || "price_low",
-      pageNumber: pageNumber,
-      pageSize: 10,
-      stock: stock,
+    const fetchData = async () => {
+      setIsLoading(true); // Set loading to true before making the API call
+
+      const data = {
+        category: param.levelThree,
+        colors: colorValue || [],
+        size: sizeValue || [],
+        minPrice: 0,
+        maxPrice: 10000,
+        minDiscount: discount || null,
+        sort: sortValue || "price_low",
+        pageNumber: pageNumber,
+        pageSize: 10,
+        stock: stock,
+      };
+
+      await dispatch(findProducts(data));
+
+      setIsLoading(false); // Set loading to false after the API call is completed
     };
 
-    dispatch(findProducts(data));
+    fetchData();
   }, [
     param.levelThree,
     colorValue,
@@ -112,6 +118,14 @@ export default function Product() {
 
   return (
     <div className="bg-white">
+      {isloading && (
+        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-25 flex items-center justify-center">
+          {/* You can add a loading spinner or any loading indicator here */}
+          <div className="spinner-border text-primary" role="status">
+            <span className="sr-only">Loading...</span>
+          </div>
+        </div>
+      )}
       <div>
         {/* Mobile filter dialog */}
         <Transition.Root show={mobileFiltersOpen} as={Fragment}>
@@ -429,8 +443,8 @@ export default function Product() {
               {/* Product grid */}
               <div className="lg:col-span-4 w-full">
                 <div className="flex flex-wrap justify-center bg-white py-5">
-                  {products.products &&
-                    products.products?.content?.map((item) => (
+                  {products?.products &&
+                    products?.products?.content?.map((item) => (
                       <ProductCard product={item} />
                     ))}
                 </div>
@@ -440,7 +454,7 @@ export default function Product() {
           <section className="w-full px-[3.6rem]">
             <div className="px-4 py-5 flex justify-center">
               <Pagination
-                count={products.products?.totalPages}
+                count={products?.products?.totalPages}
                 color="secondary"
                 onChange={handlePaginationChange}
               />

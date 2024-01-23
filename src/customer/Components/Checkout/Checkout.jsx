@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
@@ -9,41 +9,54 @@ import { useLocation, useNavigate } from "react-router-dom";
 import DeliveryAddressForm from "./DeliveryAddressForm";
 import OrderSummary from "./OrderSummary";
 import { useSelector } from "react-redux";
+import { CircularProgress } from "@mui/material";
 
 const steps = ["Login", "Delivery Address", "Order Summary", "Payment"];
 
-export default function Checkout() {
-  const [activeStep, setActiveStep] = React.useState(0);
+const Checkout = () => {
+  const [activeStep, setActiveStep] = useState(0);
+  const [loading, setLoading] = useState(true);
   const location = useLocation();
   const querySearch = new URLSearchParams(location.search);
-  const step = querySearch.get("step");
+  const step = parseInt(querySearch.get("step")) || 0; // Convert step to integer
   const navigate = useNavigate();
   const order = useSelector((store) => store.order);
-  React.useEffect(() => {
+
+  useEffect(() => {
     if (order.orderStatus === "CONFIRMED") {
       navigate(`/payment/${order._id}`);
     }
   }, [order.orderStatus, navigate, order._id]);
 
+  useEffect(() => {
+    // Simulate loading delay (replace with actual data fetching)
+    const loadingTimeout = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+
+    // Cleanup function to clear the timeout if component unmounts or changes
+    return () => clearTimeout(loadingTimeout);
+  }, []);
+
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
+
   return (
     <div className="px-10 lg:px-20 mt-8">
       <Box sx={{ width: "100%" }}>
-        <Stepper activeStep={step}>
-          {steps.map((label, index) => {
-            const stepProps = {};
-            const labelProps = {};
-
-            return (
-              <Step key={label} {...stepProps}>
-                <StepLabel {...labelProps}>{label}</StepLabel>
-              </Step>
-            );
-          })}
+        <Stepper activeStep={activeStep}>
+          {steps.map((label, index) => (
+            <Step key={label}>
+              <StepLabel>{label}</StepLabel>
+            </Step>
+          ))}
         </Stepper>
-        {activeStep === steps.length ? (
+        {loading ? (
+          <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+            <CircularProgress />
+          </div>
+        ) : activeStep === steps.length ? (
           <React.Fragment>
             <Typography sx={{ mt: 2, mb: 1 }}>
               All steps completed - you&apos;re finished
@@ -62,11 +75,13 @@ export default function Checkout() {
               </Button>
             </Box>
             <div className="mt-10">
-              {step === "2" ? <DeliveryAddressForm /> : <OrderSummary />}
+              {step === 2 ? <DeliveryAddressForm /> : <OrderSummary />}
             </div>
           </React.Fragment>
         )}
       </Box>
     </div>
   );
-}
+};
+
+export default Checkout;

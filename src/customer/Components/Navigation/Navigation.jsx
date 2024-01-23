@@ -9,7 +9,13 @@ import {
 
 import { navigation } from "./navigationData";
 import { useNavigate } from "react-router-dom";
-import { Avatar, Button, Menu, MenuItem } from "@mui/material";
+import {
+  Avatar,
+  Button,
+  CircularProgress,
+  Menu,
+  MenuItem,
+} from "@mui/material";
 import AuthModal from "../../auth/AuthModal";
 import { useDispatch, useSelector } from "react-redux";
 import { getUser, logout } from "../../../State/Auth/Action";
@@ -26,6 +32,7 @@ export default function Navigation() {
   const [anchorEl, setAnchorEl] = useState();
   const [isClosed, setIsClosed] = useState(false);
   const openUserMenu = Boolean(anchorEl);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const jwt = localStorage.getItem("jwt");
   console.log(isClosed);
@@ -53,6 +60,7 @@ export default function Navigation() {
 
     dispatch(findProducts(data));
   }, [products.deletedproduct, dispatch]);
+  console.log(products);
 
   const handleSearchInputChange = (e) => {
     const searchQuery = e.target.value;
@@ -104,8 +112,16 @@ export default function Navigation() {
   };
 
   useEffect(() => {
+    const login = async () => {
+      setLoading(true);
+      // Perform your login logic here, for example:
+      await dispatch(getUser(jwt));
+      setLoading(false);
+      handleClose();
+    };
+
     if (jwt) {
-      dispatch(getUser(jwt));
+      login();
     }
   }, [jwt, auth.jwt, dispatch]);
 
@@ -146,7 +162,11 @@ export default function Navigation() {
     <div className="bg-white z-50 relative">
       {/* Mobile menu */}
       <Transition.Root show={open} as={Fragment}>
-        <Dialog as="div" className="relative z-40 lg:hidden" onClose={setOpen}>
+        <Dialog
+          as="div"
+          className="relative mt-4 lg:hidden"
+          onClose={() => setOpen(false)}
+        >
           <Transition.Child
             as={Fragment}
             enter="transition-opacity ease-linear duration-300"
@@ -170,11 +190,11 @@ export default function Navigation() {
               leaveTo="-translate-x-full"
             >
               <Dialog.Panel className="relative flex w-full max-w-xs flex-col overflow-y-auto bg-white pb-12 shadow-xl">
-                <div className="flex px-4 pb-2 pt-5">
+                <div className="flex px-4 pb-2 pt-[4rem]">
                   <button
                     type="button"
                     className="relative -m-2 inline-flex items-center justify-center rounded-md p-2 text-gray-400"
-                    onClick={setOpen}
+                    onClick={() => setOpen(false)}
                   >
                     <span className="absolute -inset-0.5" />
                     <span className="sr-only">Close menu</span>
@@ -269,7 +289,7 @@ export default function Navigation() {
                 </Tab.Group>
 
                 <div className="space-y-6 border-t border-gray-200 px-4 py-6">
-                  {navigation.pages.map((page) => (
+                  {navigation?.pages?.map((page) => (
                     <div key={page.name} className="flow-root">
                       <a
                         href={page.href}
@@ -283,12 +303,20 @@ export default function Navigation() {
 
                 <div className="flow-root">
                   {auth.user?.firstName ? (
-                    <Button
-                      onClick={handleLogout}
-                      className="-m-2 block p-2 font-medium text-gray-900"
-                    >
-                      Logout
-                    </Button>
+                    <>
+                      <Button
+                        onClick={handleLogout}
+                        className="-m-2 block p-2 font-medium text-gray-900"
+                      >
+                        Logout
+                      </Button>
+                      <Button
+                        onClick={handleGoToProfile}
+                        className="-m-2 block p-2 font-medium text-gray-900"
+                      >
+                        Profile
+                      </Button>
+                    </>
                   ) : (
                     <Button
                       onClick={handleOpen}
@@ -315,30 +343,35 @@ export default function Navigation() {
         >
           <div className="border-b border-gray-200">
             <div className="flex h-16 items-center">
-              <button
-                type="button"
-                className="relative rounded-md bg-white p-2 text-gray-400 lg:hidden"
-                onClick={() => setOpen(true)}
-              >
-                <span className="absolute -inset-0.5" />
-                <span className="sr-only">Open menu</span>
-                <Bars3Icon className="h-6 w-6" aria-hidden="true" />
-              </button>
+              {open ? (
+                <button
+                  type="button"
+                  className="relative rounded-md bg-white p-2 text-gray-400 lg:hidden"
+                  onClick={() => setOpen(false)}
+                >
+                  <XMarkIcon className="h-6 w-6" aria-hidden="false" />
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="relative rounded-md bg-white p-2 text-gray-400 lg:hidden"
+                  onClick={() => setOpen(true)}
+                >
+                  <Bars3Icon className="h-6 w-6" aria-hidden="true" />
+                </button>
+              )}
 
               {/* Logo */}
-              <div
-                className="ml-4 flex lg:ml-0 cursor-pointer"
-                onClick={handleHome}
-              >
+              <div className="flex lg:ml-0 cursor-pointer" onClick={handleHome}>
                 <img
-                  className="h-8 w-8 mr-2"
+                  className="h-8 w-8 mr-2 "
                   src="https://friconix.com/png/fi-cnluxl-circle-notch.png"
                   alt=""
                 />
                 <img
                   src="https://th.bing.com/th/id/R.b94a42acc82b75abc2b6c8754a6fcd8e?rik=CuAobz2IOk3SDw&riu=http%3a%2f%2fwww.tieroom.co.uk%2fmedia%2ftieroom%2flanding_page%2fnotch-logo_transparent_background.png&ehk=FF55qrrs%2f2MYFYJr0i2xjUtqyW0C5kUQzh7xMG%2bYHm8%3d&risl=&pid=ImgRaw&r=0"
                   alt=""
-                  className="h-8 w-12 mr-2"
+                  className="h-8 w-12 mr-2 sm:hidden sm:w-24 lg:h-16 lg:w-32"
                 />
               </div>
 
@@ -479,7 +512,7 @@ export default function Navigation() {
                   <input
                     type="text"
                     placeholder="Search..."
-                    className="p-2 text-gry-400 hover:text-gray-500 w-[35rem]"
+                    className="p-2 text-gry-400 hover:text-gray-500 lg:w-[35rem] sm:w-[5rem]"
                     value={searchQuery}
                     onChange={handleSearchInputChange}
                   />
@@ -496,7 +529,7 @@ export default function Navigation() {
                   {/* Display search suggestions */}
                   {searchQuery &&
                     (filteredProducts.length > 0 ? (
-                      <div className="absolute z-10 mt-9 p-4 w-[35rem] bg-white border border-gray-300 rounded-md shadow-lg">
+                      <div className="absolute z-10 mt-9 p-4 lg:w-[35rem] sm:w-[5rem] bg-white border border-gray-300 rounded-md shadow-lg">
                         {filteredProducts.map((product) => (
                           <div
                             className="flex justify-stretch items-center hover:underline cursor-pointer"
@@ -572,7 +605,7 @@ export default function Navigation() {
                         className="h-6 w-6 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
                         aria-hidden="true"
                       />
-                      <span className="ml-2 text-sm font-medium text-gray-700 group-hover:text-gray-800">
+                      <span className="lg:ml-2 sm:lg-1 text-sm font-medium text-gray-700 group-hover:text-gray-800">
                         {cart.totalItem ? cart.totalItem : 0}
                       </span>
                       <span className="sr-only">items in cart, view bag</span>
@@ -584,6 +617,11 @@ export default function Navigation() {
           </div>
         </nav>
       </header>
+      {loading && (
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+          <CircularProgress />
+        </div>
+      )}
       <AuthModal handleClose={handleClose} open={openAuthModel} />
     </div>
   );

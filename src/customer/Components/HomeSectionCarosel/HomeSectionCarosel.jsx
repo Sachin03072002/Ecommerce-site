@@ -6,12 +6,11 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 
 const HomeSectionCarosel = ({ data, sectionName }) => {
   const carouselRef = useRef(null);
-
   const [activeIndex, setActiveIndex] = useState(0);
 
   const responsive = {
     0: { items: 1 },
-    768: { items: 1 },
+    768: { items: 1.5 },
     1024: { items: 5.5 },
   };
 
@@ -49,11 +48,12 @@ const HomeSectionCarosel = ({ data, sectionName }) => {
           ref={carouselRef}
         />
 
+        {/* Render next button only on large screens */}
         {activeIndex !== items?.length - 1 && (
           <Button
             onClick={slideNext}
             variant="contained"
-            className="z-50 bg-white hidden lg:block"
+            className="z-40 bg-white sm:hidden lg:block"
             sx={{
               position: "absolute",
               top: "50%",
@@ -68,11 +68,12 @@ const HomeSectionCarosel = ({ data, sectionName }) => {
           </Button>
         )}
 
+        {/* Render prev button only on large screens */}
         {activeIndex !== 0 && (
           <Button
             onClick={slidePrev}
             variant="contained"
-            className="z-50 bg-white hidden lg:block"
+            className="z-40 bg-white sm:hidden lg:block"
             sx={{
               position: "absolute",
               top: "50%",

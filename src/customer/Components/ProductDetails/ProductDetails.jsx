@@ -1,6 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { RadioGroup } from "@headlessui/react";
-import { Box, Button, Grid, LinearProgress, Rating } from "@mui/material";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Grid,
+  LinearProgress,
+  Rating,
+} from "@mui/material";
 import ProductReviewCard from "./ProductReviewCard";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -102,6 +109,7 @@ const calculateRatingDistribution = (ratings) => {
 
 export default function ProductDetails() {
   const [selectedSize, setSelectedSize] = useState("");
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const params = useParams();
   const dispatch = useDispatch();
@@ -116,8 +124,13 @@ export default function ProductDetails() {
   useEffect(() => {
     const productId = params.productId?.toString();
     const data = { productId };
-    dispatch(findProductsById(data));
-    dispatch(getAllRatingsReviews(productId));
+    setLoading(true);
+    dispatch(findProductsById(data))
+      .then(() => setLoading(false))
+      .catch(() => setLoading(false));
+    dispatch(getAllRatingsReviews(productId))
+      .then(() => setLoading(false))
+      .catch(() => setLoading(false));
   }, [params.productId, dispatch]);
   const ratings = rating.ratingsReviews.ratings;
   const { averageRating, percentageDistribution } =
@@ -135,6 +148,7 @@ export default function ProductDetails() {
   );
 
   useEffect(() => {
+    setLoading(true);
     // Fetch products for each category
     categories.forEach((category) => {
       const data = {
@@ -150,50 +164,21 @@ export default function ProductDetails() {
         stock: "",
       };
 
-      dispatch(findProducts(data));
+      dispatch(findProducts(data))
+        .then(() => setLoading(false))
+        .catch(() => setLoading(false));
     });
   }, [categories, dispatch]);
+  if (loading) {
+    return (
+      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+        <CircularProgress />
+      </div>
+    ); // Render loader while loading
+  }
   return (
     <div className="bg-white lg:px-20">
       <div className="pt-6">
-        <nav aria-label="Breadcrumb">
-          {/* <ol
-            role="list"
-            className="mx-auto flex max-w-2xl items-center space-x-2 px-4 sm:px-6 lg:max-w-7xl lg:px-8"
-          >
-            {product.breadcrumbs.map((breadcrumb) => (
-              <li key={breadcrumb.id}>
-                <div className="flex items-center">
-                  <a
-                    href={breadcrumb.href}
-                    className="mr-2 text-sm font-medium text-gray-900"
-                  >
-                    {breadcrumb.name}
-                  </a>
-                  <svg
-                    width={16}
-                    height={20}
-                    viewBox="0 0 16 20"
-                    fill="currentColor"
-                    aria-hidden="true"
-                    className="h-5 w-4 text-gray-300"
-                  >
-                    <path d="M5.697 4.34L8.98 16.532h1.327L7.025 4.341H5.697z" />
-                  </svg>
-                </div>
-              </li>
-            ))}
-            <li className="text-sm">
-              <a
-                href={product.href}
-                aria-current="page"
-                className="font-medium text-gray-500 hover:text-gray-600"
-              >
-                {product.name}
-              </a>
-            </li>
-          </ol> */}
-        </nav>
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-10 px-4 pt-10">
           {/* Image gallery */}
           <div className="flex flex-col items-center">

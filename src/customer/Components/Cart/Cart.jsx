@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import CartItem from "./CartItem";
-import { Button } from "@mui/material";
+import { Button, CircularProgress } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getCart } from "../../../State/Cart/Action";
@@ -9,20 +9,28 @@ const Cart = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const cart = useSelector((store) => store.cart);
+  const [loading, setLoading] = useState(true);
 
   const handleCheckOut = () => {
     navigate("/checkout?step=2");
   };
 
   useEffect(() => {
-    dispatch(getCart());
+    setLoading(true);
+    dispatch(getCart())
+      .then(() => setLoading(false))
+      .catch(() => setLoading(false));
   }, [cart.updateCartItem, cart.deleteCartItem, dispatch]);
 
   return (
     <div className="flex justify-center items-center h-full">
       <div className="lg:grid grid-cols-3 lg:px-16 relative w-full max-w-screen-xl">
         <div className="col-span-2">
-          {cart.cart?.cartItems?.length > 0 ? (
+          {loading ? (
+            <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+              <CircularProgress />
+            </div>
+          ) : cart.cart?.cartItems?.length > 0 ? (
             cart.cart?.cartItems?.map((item) => (
               <CartItem key={item.id} item={item} />
             ))
